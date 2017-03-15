@@ -581,17 +581,14 @@ export const add = (newTitle, newLink) =&gt; {
 <li>Now replace the <code>render</code> function of the HackerApp component with the following code. This replaces the previous use of stubAPI with the new posts state retrieved from the api package.</li>
 </ul>
 <pre><code class="lang-javascript">render: function(){
-
+    const posts = _.sortBy(this.state.posts, post =&gt;
+          post.upvotes);
     return (
       &lt;div &gt;
-       &lt;NewsList posts={_.sortBy(this.state.posts, post =&gt;
-             post.upvotes
-
-      )}
+       &lt;NewsList posts={posts}
             upvoteHandler={this.incrementUpvote} /&gt;
        &lt;Form addHandler={this.addPost} /&gt;
      &lt;/div&gt;
-
     );
 }</code></pre>
 <p>Now have a look at the app in the browser. You should see the list of news items as before. This time, however, they are retrieved from the Express API.
