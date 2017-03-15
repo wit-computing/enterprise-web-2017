@@ -598,10 +598,12 @@ Try to add a new post. You&#39;ll notice nothing happens. Next we will update th
 <li>Locate the <code>addPost()</code> function in the HackerApp component. Replace it with the following:</li>
 </ul>
 <pre><code class="lang-javascript">addPost : function(title,link) {
-          api.add(title,link).then(resp =&gt; {
-          this.state.posts.push({&quot;id&quot;:resp.id,&quot;title&quot;:title,&quot;link&quot;:link,&quot;upvotes&quot;:0};
-          this.setState({})});
-      }</code></pre>
+  api.add(title,link)
+  .then(resp =&gt; {
+                const newPost = {&quot;id&quot;:resp.id,&quot;title&quot;:title,&quot;link&quot;:link,&quot;upvotes&quot;:0, &quot;comments&quot;:[]};
+                this.setState({posts: this.state.posts.concat([newPost])});
+  })
+}</code></pre>
 <p>This function calls the Express API which returns a promise. When the promise is fulfilled, then it pushes the new post onto the posts state property. The HackerApp should react to this state and call the render function again.</p>
 <p>Check the app in the browser again. You should be able add posts to the list.</p>
 <h3>Upvoting a Post</h3>
