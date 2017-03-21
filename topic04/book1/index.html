@@ -184,8 +184,8 @@ body
       <br>
       
       <div  class="ui tab segment lab" data-tab="node-lab3">
-        <h1><img src="download.png" alt=""></h1>
-<p>This lab introduces Mongoose, a simple way of interacting with your Mongo database. </p>
+        <h1>Mongoose</h1>
+<p>This lab introduces Mongoose, a simple way of interacting with your Mongo database.</p>
 
       </div>
      
@@ -196,17 +196,21 @@ body
 <p>Check it works as before by running:</p>
 <pre><code>npm start</code></pre>
 <h3>Get Mongo and Mongoose and Lodash</h3>
-<p>Download and install Mongodb by selecting the relevant installer for your OS:</p>
+<p><img src="./img/download.png" alt="Mongoose">
+Download and install Mongodb by selecting the relevant installer for your OS:</p>
 <p><a href="https://www.mongodb.com/download-center?jmp=nav#community">MongoDB</a></p>
 <p>Follow the instructions and accept all defaults.</p>
-<p>Open a terminal in  folder and install Mongoose and Lodash as follows:</p>
+<p>All going well, you should be able to start MongoDB with default settings  by opening a command window and enter:
+<code>javascript
+mongod</code></p>
+<p>Open a terminal in  folder and install Mongoose as follows:</p>
 <p><code>npm install -save mongoose</code></p>
 
       </div>
      
       <div  class="ui tab segment lab" data-tab="02">
         <h1>Create a Mongoose Schema for Contacts</h1>
-<p>With Mongoose we declare the object structure (or schema) for each collection in the database - this app has only one. In your node-lab3 folder, Create the file <em>api/contact/contact.model.js</em> and add the following code:</p>
+<p>With Mongoose we declare the object structure (or schema) for each collection in the database - this app has only one. In your node-lab3 folder, create the file <em>api/contact/contactModel.js</em> and add the following code:</p>
 <pre><code class="lang-javascript">const mongoose = require(&#39;mongoose&#39;),
 Schema = mongoose.Schema;
 
@@ -217,6 +221,7 @@ const ContactSchema = new Schema({
   email: String,
   updated: { type: Date, default: Date.now }
 });
+
 
 export default mongoose.model(&#39;contacts&#39;, ContactSchema);</code></pre>
 <p>Schema is a constructor function provided by Mongoose for creating schema instances (ContactSchema). The last line of code above associates the schema instance with a database collection named contacts (MongoDB creates unknown collections automatically, if necessary). The model() method returns a model object, which has special methods for querying and manipulating the associated collection, e.g. find(), findById(), create() etc.</p>
@@ -229,11 +234,11 @@ export default mongoose.model(&#39;contacts&#39;, ContactSchema);</code></pre>
 <p>In your <code>config</code> file, include the mongoDbURI in the default export. Also, we will include a <code>seedDb</code> property to indicate if we wish to seed the database with data. This would only be used in development/testing environments.</p>
 <pre><code class="lang-javascript">...
 export default {
-  mongoDbURI: &#39;mongodb://localhost:27017/test&#39;,
-  seedDb:true,
+  mongoDb: &#39;mongodb://localhost:27017/test&#39;,
+  seedDb: true,
   port: env.PORT || 8080,
   host: env.HOST || &#39;localhost&#39;,
-  get serverUrl() {
+  get serverUrl(){
     return `http://${this.host}:${this.port}`;
   }
   ....</code></pre>
@@ -243,7 +248,7 @@ export default {
 </ul>
 <pre><code class="lang-javascript">import mongoose from &#39;mongoose&#39;;
 import assert from &#39;assert&#39;;
-import contactModel from &#39;./api/contacts/contactSchema&#39;;
+import contactModel from &#39;./api/contacts/contactModel&#39;;
 import config from &#39;./config&#39;;
 
 const contacts = [
@@ -291,16 +296,16 @@ mongoose.connect(config.mongoDb);
 // Populate DB with sample data
 if(config.seedDb) {
     loadContacts();
-}</code></pre>
-<p>Check the</p>
+}
+....</code></pre>
+<p>Check, using the Mongo Shell, that the data has been entered when the server restarts.</p>
 
       </div>
      
       <div  class="ui tab segment lab" data-tab="04">
         <h1>Update Contacts Routing Package</h1>
-<p>We need to change <code>api/contacts/index.js</code> to incorporate Mongoose to connect to MongoDB. We also should externalise the connection string for the MongoDB as a config parameters.  </p>
-<h3>Change <code>/api/contacts/index.js</code></h3>
-<p>First, replace  <code>/api/contacts/index.js</code>  with the following code</p>
+<p>We need to change <code>api/contacts/index.js</code> to incorporate Mongoose to connect to MongoDB.
+First, replace  <code>/api/contacts/index.js</code>  with the following code</p>
 <pre><code class="lang-javascript">
 import express from &#39;express&#39;;
 import _ from &#39;lodash&#39;;
@@ -343,7 +348,7 @@ router.put(&#39;/:id&#39;, (req, res) =&gt; {
    Contact.findById(req.params.id,  (err, contact) =&gt; {
       if (err) { return handleError(res, err); }
         if(!contact) { return res.send(404); }
-            const updated = _.merge(contact, req.body);
+            const updated = _.merge(contact, updateContact);
             updated.save((err) =&gt; {
                   if (err) { return handleError(res, err); }
                           return res.send(contact);
@@ -379,7 +384,7 @@ export default router;</code></pre>
      
       <div  class="ui tab segment lab" data-tab="05">
         <h1>Test the app</h1>
-<p>Open a browser window and experiment with the API. Check that the following functions work:</p>
+<p>Use Postman to experiment with the API. Check that the following functions work:</p>
 <ul>
 <li>GET     /contacts              -&gt;  index</li>
 <li>POST    /contacts            -&gt;  create</li>
@@ -399,9 +404,12 @@ export default router;</code></pre>
     return true;
 
 });</code></pre>
-<p>Using the material covered in lectures, update your app to do the following:
-- Make the <em>name</em> and <em>email</em> fields required.
-- Validate the email address (hint: write a custom validator that uses regular expressions. Check out this post <a href="http://stackoverflow.com/questions/18022365/mongoose-validate-email-syntax">stack overflow</a>).</p>
+<h2>Challenge</h2>
+<p>Using the material covered in lectures, update your app to do the following:</p>
+<ul>
+<li>Make the <em>name</em> and <em>address</em> fields required.</li>
+<li>Validate the format of the email address (hint: write a custom validator that uses regular expressions. Check out this post <a href="http://stackoverflow.com/questions/18022365/mongoose-validate-email-syntax">stack overflow</a>).</li>
+</ul>
 
       </div>
      
@@ -428,7 +436,7 @@ const CommentSchema = new Schema({
  });
 export default mongoose.model(&#39;posts&#39;, PostSchema);</code></pre>
 <p>This file exports the model for hacker news posts. Notice the use of two schemas, CommentSchema and PostSchema, with the former used as the type for the comments in the latter.
-+ We want to be able to seed the database with test data during development. Create a new file called loadNewsData in the root <em>node-lab3</em> folder.</p>
++ We want to be able to seed the database with test data during development. Create a new file called <em>newsData.js</em> in the root <em>node-lab3</em> folder.</p>
 <pre><code class="lang-javascript">import postModel from &#39;./api/news/newsModel&#39;;
 
 const  posts = [
@@ -492,6 +500,7 @@ if(config.seedDb) {
     loadPosts();
 }
 ...</code></pre>
+<p>The Server should now load the news data to MongoDB.</p>
 
       </div>
      
@@ -590,6 +599,11 @@ function handleError(res, err) {
 };
 
 export default router;</code></pre>
+<h2>Challenge</h2>
+<ul>
+<li>add the correct route for upvoting a post.</li>
+<li>update the code to return the first 5 posts, ordered by date added.</li>
+</ul>
 
       </div>
      
